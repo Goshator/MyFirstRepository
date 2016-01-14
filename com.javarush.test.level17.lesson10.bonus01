@@ -1,0 +1,131 @@
+package com.javarush.test.level17.lesson10.bonus01;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+/* CRUD
+CrUD - Create, Update, Delete
+Программа запускается с одним из следующих наборов параметров:
+-c name sex bd
+-u id name sex bd
+-d id
+-i id
+Значения параметров:
+name - имя, String
+sex - пол, "м" или "ж", одна буква
+bd - дата рождения в следующем формате 15/04/1990
+-c  - добавляет человека с заданными параметрами в конец allPeople, выводит id (index) на экран
+-u  - обновляет данные человека с данным id
+-d  - производит логическое удаление человека с id
+-i  - выводит на экран информацию о человеке с id: name sex (м/ж) bd (формат 15-Apr-1990)
+
+id соответствует индексу в списке
+Все люди должны храниться в allPeople
+Используйте Locale.ENGLISH в качестве второго параметра для SimpleDateFormat
+
+Пример параметров: -c Миронов м 15/04/1990
+*/
+
+public class Solution
+{
+    public static List<Person> allPeople = new ArrayList<Person>();
+
+    static
+    {
+        allPeople.add(Person.createMale("Иванов Иван", new Date()));  //сегодня родился    id=0
+        allPeople.add(Person.createMale("Петров Петр", new Date()));  //сегодня родился    id=1
+    }
+
+    public static void main(String[] args)
+    {
+        //while (true)
+        //{
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            String[] inputStringArray;
+            try
+            {
+                inputStringArray = parseInputString(reader.readLine());
+                chooseMethod(inputStringArray);
+
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        //}
+    }
+
+    public static String[] parseInputString(String inputString)
+    {
+        String[] inputStringArray = inputString.split(" ");
+        return inputStringArray;
+    }
+
+    public static void chooseMethod(String[] array)
+    {
+        SimpleDateFormat outputDate = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
+        String sex = null;
+        String[] newDate = null;
+        Date newBirthday = null;
+        SimpleDateFormat inputBirthdayDate = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+        if (array.length == 2)
+        {
+            if (array[0].equals("-i"))//информация
+            {
+                if (allPeople.get(Integer.parseInt(array[1])).getSex().equals(Sex.MALE))
+                {
+                    sex = "м";
+                }
+                if (allPeople.get(Integer.parseInt(array[1])).getSex().equals(Sex.FEMALE))
+                {
+                    sex = "ж";
+                }
+                System.out.println(allPeople.get(Integer.parseInt(array[1])).getName() + " " + sex + " " + outputDate.format(allPeople.get(Integer.parseInt(array[1])).getBirthDay()));
+            }
+            if (array[0].equals("-d"))//удаление
+            {
+                allPeople.remove(Integer.parseInt(array[1]));
+            }
+        }
+        if (array.length == 5)
+        {
+            newDate = array[4].split("/");
+            newBirthday = new Date(Integer.parseInt(newDate[2]) - 1900, Integer.parseInt(newDate[1]) - 1, Integer.parseInt(newDate[0]));
+            if (array[0].equals("-u"))
+            {
+                if (array[3].equals("ж"))
+                {
+                    allPeople.set(Integer.parseInt(array[1]), Person.createFemale((array[2]), newBirthday));
+                }
+                if (array[3].equals("м"))
+                {
+                    allPeople.set(Integer.parseInt(array[1]), Person.createMale((array[2]), newBirthday));
+                }
+            }
+        }
+        if (array.length == 4)
+        {
+            newDate = array[3].split("/");
+            newBirthday = new Date(Integer.parseInt(newDate[2]) - 1900, Integer.parseInt(newDate[1]) - 1, Integer.parseInt(newDate[0]));
+            if (array[0].equals("-c"))
+            {
+                if (array[2].equals("ж"))
+                {
+                    allPeople.add(Person.createFemale((array[1]), newBirthday));
+                }
+                if (array[2].equals("м"))
+                {
+                    allPeople.add(Person.createMale((array[1]), newBirthday));
+                }
+            }
+        }
+        }
+}
+
+
